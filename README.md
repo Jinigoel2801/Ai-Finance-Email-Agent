@@ -8,7 +8,7 @@ Built with **Python**, **Groq API (Llama 3)**, **Celery + Redis**, **APScheduler
 
 ## Dashboard Previews
 
-![Dashboard Key Metrics & Timeline](assets/dashboard_main.png)
+![Dashboard Key Metrics & Timeline](assests/dashboard_analytics.png)
 *The main dashboard showing high-level processing metrics and the full activity timeline.*
 
 ![Email Analytics Charts](assets/dashboard_analytics.png)
