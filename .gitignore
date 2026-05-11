@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+.env
+audit_log.db
+dry_run_log.json
+.DS_Store

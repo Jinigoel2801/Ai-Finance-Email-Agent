@@ -1,0 +1,9 @@
+invoice_no,client_name,amount_due,due_date,contact_email,follow_up_count,payment_link
+INV-2025-001,Jinia Goel,46000.00,2026-05-06,jinia9350@gmail.com,0,https://pay.example.com/inv/INV-2025-001
+INV-2025-002,Jaya Singh,98700.00,2026-04-04,jaya.singh@globaledge.in,0,https://pay.example.com/inv/INV-2025-002
+INV-2025-003,Rohan Sharma,50000.00,2026-04-18,jinia9350@gmail.com,0,https://pay.example.com/inv/INV-2025-003
+INV-2025-004,Amit Kumar,15000.00,2026-05-01,amit.kumar@example.com,1,https://pay.example.com/inv/INV-2025-004
+INV-2025-005,Priya Reddy,22000.50,2026-04-25,priya.reddy@example.com,0,https://pay.example.com/inv/INV-2025-005
+INV-2025-006,Suresh Menon,8900.00,2026-03-10,suresh.menon@example.com,2,https://pay.example.com/inv/INV-2025-006
+INV-2025-007,Neha Gupta,105000.00,2026-05-08,neha.gupta@example.com,0,https://pay.example.com/inv/INV-2025-007
+INV-2025-008,Vikram Desai,34000.00,2026-02-15,vikram.desai@example.com,3,https://pay.example.com/inv/INV-2025-008
