@@ -1,8 +1,21 @@
 # Finance Credit Follow-Up Email Agent
 
-An AI-powered agent that reads overdue invoice records, determines the correct escalation stage based on days overdue, generates personalised follow-up emails using Claude (Anthropic), sends or mock-sends them, and logs every action to a SQLite audit trail.
+An AI-powered agent that reads overdue invoice records, determines the correct escalation stage based on days overdue, generates personalised follow-up emails using Llama 3 (via Groq API), sends or mock-sends them, and logs every action to a `dry_run_log.json` file.
 
-Built with **Python**, **Anthropic Claude**, **Celery + Redis**, **APScheduler**, and **Streamlit**.
+Built with **Python**, **Groq API (Llama 3)**, **Celery + Redis**, **APScheduler**, and **Streamlit**.
+
+---
+
+## Dashboard Previews
+
+![Dashboard Key Metrics & Timeline](assets/dashboard_main.png)
+*The main dashboard showing high-level processing metrics and the full activity timeline.*
+
+![Email Analytics Charts](assets/dashboard_analytics.png)
+*Visual analytics breaking down the status distribution and escalation stages.*
+
+![Filtered Timeline View](assets/dashboard_filtered.png)
+*Detailed filtering capabilities by stage, status, and custom date ranges.*
 
 ---
 
@@ -17,7 +30,7 @@ Built with **Python**, **Anthropic Claude**, **Celery + Redis**, **APScheduler**
                                                   │
                           ┌───────────────────────▼──────────────┐
                           │         Email Generator              │
-                          │   (Anthropic Claude Sonnet 4)        │
+                          │        (Groq / Llama 3)              │
                           │   system prompt → JSON {subj, body}  │
                           └───────────────────────┬──────────────┘
                                                   │
@@ -28,9 +41,9 @@ Built with **Python**, **Anthropic Claude**, **Celery + Redis**, **APScheduler**
                      └────────────────────────────┬────────────┘
                                                   │
                      ┌────────────────────────────▼────────────┐
-                     │          SQLite Audit Trail             │
-                     │   audit_log.db — every attempt logged   │
-                     │   PII masked (r***@domain.com)          │
+                     │             JSON Log File               │
+                     │ dry_run_log.json — every attempt logged │
+                     │ useful for local review & preview       │
                      └────────────────────────────┬────────────┘
                                                   │
                      ┌────────────────────────────▼────────────┐
@@ -70,7 +83,7 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-# Edit .env and set your ANTHROPIC_API_KEY
+# Edit .env and set your GROQ_API_KEY
 ```
 
 ### 5. Start Redis (required for Celery only)
@@ -127,11 +140,11 @@ The `DRY_RUN` environment variable defaults to `true` — you must explicitly se
 
 | Component | Technology | Rationale |
 |-----------|-----------|-----------|
-| **LLM** | Anthropic Claude Sonnet 4 | High-quality text generation with structured JSON output |
+| **LLM** | Groq (Llama 3) | High-quality text generation with structured JSON output |
 | **Data Validation** | Pydantic v2 | Type-safe models for both input (invoices) and output (emails) |
 | **Task Queue** | Celery + Redis | Async processing with retry logic and rate limiting |
 | **Scheduler** | APScheduler | Lightweight cron-like scheduling without OS-level cron |
-| **Audit DB** | SQLite | Zero-config, file-based, perfect for audit trails |
+| **JSON Log** | Local File | Simple file-based JSON logging for quick review |
 | **Dashboard** | Streamlit | Rapid prototyping of data-centric UIs |
 | **Config** | python-dotenv | Secure env-var management, no hardcoded secrets |
 
@@ -142,7 +155,7 @@ The `DRY_RUN` environment variable defaults to `true` — you must explicitly se
 | Risk | Mitigation |
 |------|-----------|
 | **Prompt Injection** | All user-supplied fields (`client_name`, `invoice_no`) are sanitised — `<`, `>`, `"`, and newlines are stripped before prompt insertion. The system prompt instructs the LLM to return only JSON. |
-| **Data Privacy / PII** | Contact emails are masked (`r***@domain.com`) before storage in the audit database. Raw emails are never persisted. |
+| **Data Privacy / PII** | Contact emails and raw messages are logged locally in `dry_run_log.json` for review. This file should be treated as sensitive and is gitignored. |
 | **API Key Exposure** | All secrets loaded from `.env` via `python-dotenv`. `.env` is gitignored. `.env.example` contains only placeholder values. |
 | **Hallucination Risk** | LLM output is validated against a strict Pydantic schema (`EmailOutput`). All invoice fields are provided in the prompt — the model is instructed never to fabricate data. |
 | **Unauthorised Access** | SMTP credentials are environment-scoped. `DRY_RUN=true` is the default — real emails require explicit opt-in. Celery tasks are rate-limited to 10/min. |
@@ -183,11 +196,11 @@ The `DRY_RUN` environment variable defaults to `true` — you must explicitly se
    - 22–30 days → `stage_4` (Stern and Urgent)
    - 31+ days → `ESCALATE` (flagged for legal review, no email sent)
 
-3. **Generate** — `email_gen.py` calls Claude with a structured prompt containing the invoice details and tone instructions. The response is parsed and validated as an `EmailOutput` (subject + body).
+3. **Generate** — `email_gen.py` calls the Groq API (Llama 3) with a structured prompt containing the invoice details and tone instructions. The response is parsed and validated as an `EmailOutput` (subject + body).
 
 4. **Send** — `sender.py` dispatches the email. In dry-run mode (default), the email is printed to console and logged to `dry_run_log.json`. In real mode, it is sent via SMTP with TLS.
 
-5. **Audit** — `audit.py` logs every attempt (success, failure, dry-run, escalation) to `audit_log.db` with masked email addresses.
+5. **Log** — The agent logs all email previews directly to `dry_run_log.json` for manual inspection and record-keeping.
 
 6. **Dashboard** — `app.py` provides a Streamlit UI showing metrics, the full audit trail, and manual trigger controls.
 
