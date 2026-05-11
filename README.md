@@ -8,13 +8,13 @@ Built with **Python**, **Groq API (Llama 3)**, **Celery + Redis**, **APScheduler
 
 ## Dashboard Previews
 
-![Dashboard Key Metrics & Timeline](assests/dashboard_analytics.png)
+![Dashboard Key Metrics & Timeline](assests/dashboard_main.png)
 *The main dashboard showing high-level processing metrics and the full activity timeline.*
 
-![Email Analytics Charts](assets/dashboard_analytics.png)
+![Email Analytics Charts](assests/dashboard_analytics.png)
 *Visual analytics breaking down the status distribution and escalation stages.*
 
-![Filtered Timeline View](assets/dashboard_filtered.png)
+![Filtered Timeline View](assests/dashboard_filtered.png)
 *Detailed filtering capabilities by stage, status, and custom date ranges.*
 
 ---
